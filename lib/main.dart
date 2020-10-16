@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:inventory_management_system/Screens/details_screen.dart';
 import 'package:inventory_management_system/Screens/login.dart';
 import 'package:inventory_management_system/Screens/signup.dart';
 import 'package:inventory_management_system/Screens/welcome.dart';
