@@ -1,3 +1,7 @@
+import 'dart:convert';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart' as http;
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:inventory_management_system/Screens/Scanner.dart';
@@ -10,6 +14,8 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final email = new TextEditingController();
+  final password = new TextEditingController();
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -39,6 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
             Container(
               width: size.width-40,
               child: TextFormField(
+                controller: email,
                 decoration: InputDecoration(
                     labelText: 'Email ID'
                 ),
@@ -49,6 +56,7 @@ class _LoginScreenState extends State<LoginScreen> {
               Container(
                 width: size.width-40,
                 child: TextFormField(
+                  controller: password,
                   obscureText: true,
                   decoration: InputDecoration(
                       labelText: 'Password'
@@ -61,11 +69,24 @@ class _LoginScreenState extends State<LoginScreen> {
               child: RaisedButton(
                 shape: StadiumBorder(),
                 color: Colors.blue,
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => QRScanner()),
-                  );
+                onPressed: () async {
+                  bool result = await signIn([email.text,password.text]);
+
+                  if(result==true)
+                  {
+                    Fluttertoast.showToast(msg: 'Login Successful ');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => QRScanner()),
+                    );
+
+                  }
+                  else{
+                    Fluttertoast.showToast(msg: 'Login Failed');
+                  }
+
+
+
                 },
                 child: Text('LOG IN',style: TextStyle(color: Colors.white),),
               ),),
@@ -78,3 +99,34 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
+
+Future<bool> signIn(details) async{
+  print(details);
+  print('Running');
+  var data=details;
+  String body =json.encode(data);
+  var url = 'https://demo121flutter.000webhostapp.com/login.php';
+  http.Response response = await http.post(url, body:body);
+  var result = jsonDecode(response.body);
+  if(result.toString()=='False')
+  {
+    //incorrect username or password
+    print("Access denied");
+    return false;
+  }
+
+  else if(result.toString()=='True')
+  {
+    print("Access granted");//goes to next page
+    return true;
+  }
+
+
+  else
+    print("ERROR");
+
+
+
+}
+
+

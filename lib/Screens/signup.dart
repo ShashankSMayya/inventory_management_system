@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:inventory_management_system/Screens/login.dart';
 import 'package:inventory_management_system/widgets/titleText.dart';
 import 'dart:convert';
+import 'package:fluttertoast/fluttertoast.dart';
 
 
 class SignUpScreen extends StatefulWidget {
@@ -116,17 +117,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
               child: RaisedButton(
                 shape: StadiumBorder(),
                 color: Colors.blue,
-                onPressed: () {
-                  if(password!=confirmPassword)
+                onPressed: () async {
+                  bool result = await signUp([name.text,phone.text,email.text,password.text]);
+
+                  if(result==true)
                     {
+                      Fluttertoast.showToast(msg: 'Account Created Successfully');
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => LoginScreen()),
+                      );
 
-                    }else{
-
-                    signUp([name,phone,email,password]);
-
-
-
+                    }
+                  else{
+                    Fluttertoast.showToast(msg: 'Account Creation failed');
                   }
+
 
 
                 },
@@ -143,16 +149,28 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 }
 
-Future signUp(details) async{
+Future<bool> signUp(details) async{
+  print(details);
+  print('Running');
   var data=details;
   String body =json.encode(data);
-  var url = 'https://demo121flutter.000webhostapp.com/%27+signup+%27.php';
+  var url = 'https://demo121flutter.000webhostapp.com/signup.php';
   http.Response response = await http.post(url, body:body);
   var result = jsonDecode(response.body);
-  if(result.toString()=='False')//incorrect username or password
-    print("Access denied");
+  if(result.toString()=='False')
+    {
+      //incorrect username or password
+      print("Access denied");
+      return false;
+  }
+
   else if(result.toString()=='True')
-    print("Access granted");//goes to next page
+    {
+      print("Access granted");//goes to next page
+      return true;
+    }
+
+
   else
     print("ERROR");
 

@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:barcode_scan/barcode_scan.dart';
 import 'dart:async';
+import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart';
 import 'package:inventory_management_system/Screens/details_screen.dart';
 
@@ -19,6 +22,8 @@ class _QRScanner extends State<QRScanner> {
         result = qrRes.rawContent;
         print("\n\n\n" + result);
       });
+      getData(result);
+
 
       // Navigator.push(
       //   context,
@@ -60,7 +65,7 @@ class _QRScanner extends State<QRScanner> {
         width: double.infinity,
         alignment: Alignment.center,
         child: Text(
-          'Welcome User',
+          result,
           style: TextStyle(
             fontSize: 40,
           ),
@@ -84,4 +89,20 @@ class _QRScanner extends State<QRScanner> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
+}
+
+Future<String> getData(details) async{
+  var data=details;
+  String body =json.encode(data);
+  var url = 'https://demo121flutter.000webhostapp.com/product_details.php';
+  http.Response response = await http.post(url, body:body);
+  var result = jsonDecode(response.body);
+  print(result);
+  return result;
+  // if(result.toString()=='False')//incorrect username or password
+  //   print("Failed to fetch");
+  // else if(result.toString()=='True')
+  //   print("Data fetched");//goes to next page
+  // else
+  //   print("ERROR");
 }
