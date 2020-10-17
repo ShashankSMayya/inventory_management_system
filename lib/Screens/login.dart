@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:inventory_management_system/Screens/Scanner.dart';
@@ -118,6 +120,16 @@ Future<bool> signIn(details) async{
   else if(result.toString()=='True')
   {
     print("Access granted");//goes to next page
+    addStringToSF('email',details[0].toString());
+    addStringToSF('password',details[1].toString());
+    var data=details[0];
+    String body =json.encode(data);
+    var url = 'https://demo121flutter.000webhostapp.com/getUsername.php';
+    http.Response response = await http.post(url, body:body);
+    var usrname = jsonDecode(response.body);
+    addStringToSF('username',usrname.toString());
+    var name = await getStringValuesSF();
+    print(name.substring(11,name.length - 1));
     return true;
   }
 
@@ -129,4 +141,14 @@ Future<bool> signIn(details) async{
 
 }
 
+addStringToSF(key,value) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setString(key.toString(), value.toString());
+}
+
+getStringValuesSF() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String stringValue = prefs.getString('username');
+  return stringValue;
+}
 

@@ -52,9 +52,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 controller: name,
                 decoration: InputDecoration(
                   labelText: 'Name',
-                  icon: Icon(
-                    Icons.account_circle_rounded,
-                  ),
+                 // icon: Icon(
+                  //  Icons.account_circle_rounded,
+                 // ),
                 ),
               ),
             ),
