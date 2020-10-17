@@ -23,6 +23,9 @@ class _LoginScreenState extends State<LoginScreen> {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
+        actions: [
+
+        ],
         title: appBar(context),
         elevation: 0.0,
         backgroundColor: Colors.transparent,
@@ -77,10 +80,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   if(result==true)
                   {
                     Fluttertoast.showToast(msg: 'Login Successful ');
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => QRScanner()),
-                    );
+                   Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>QRScanner()));
 
                   }
                   else{
@@ -129,7 +129,7 @@ Future<bool> signIn(details) async{
     var usrname = jsonDecode(response.body);
     addStringToSF('username',usrname.toString());
     var name = await getStringValuesSF();
-    print(name.substring(11,name.length - 1));
+    //print(name.substring(11,name.length - 1));
     return true;
   }
 
@@ -143,6 +143,7 @@ Future<bool> signIn(details) async{
 
 addStringToSF(key,value) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.clear();
   prefs.setString(key.toString(), value.toString());
 }
 

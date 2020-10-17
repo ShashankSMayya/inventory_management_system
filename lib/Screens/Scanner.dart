@@ -3,27 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:barcode_scan/barcode_scan.dart';
 import 'dart:async';
 import 'package:flutter/services.dart';
+import 'package:inventory_management_system/Screens/welcome.dart';
+import 'package:inventory_management_system/widgets/titleText.dart';
 import 'details_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
-  runApp(MyApp());
-}
 
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: QRScanner(),
-    );
-  }
-}
 
 class QRScanner extends StatefulWidget {
   @override
@@ -31,7 +17,14 @@ class QRScanner extends StatefulWidget {
 }
 
 class _QRScanner extends State<QRScanner> {
-  var result = "",usrname;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    getUsername();
+    super.initState();
+  }
+  var result = "",usrname='';
 
   Future getUsername() async{
     usrname= await getStringValuesSF();
@@ -50,14 +43,16 @@ class _QRScanner extends State<QRScanner> {
   Future _scan() async {
     try {
       ScanResult qrRes = await BarcodeScanner.scan();
+      var qrResult=qrRes.rawContent;
+      print('QR'+qrResult);
       setState(()  {
-        addUserlog(qrRes);
+        addUserlog(qrResult);
       });
       Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) =>
-                DetailsScreen(result, currentPhoneDate.toString())),
+                DetailsScreen()),
       );
       addStringToSF('product_id',result);
     } on PlatformException catch (ex) {
@@ -81,31 +76,47 @@ class _QRScanner extends State<QRScanner> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    getUsername();
-  }
+
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
-        title: Container(
-          child: Text("Scan Part"),
-          width: double.infinity,
-          alignment: Alignment.center,
-        ),
-      ),
+        title: appBar(context),
+    elevation: 0.0,
+    backgroundColor: Colors.transparent,
+    centerTitle: true,
+    ),
       body: Container(
         width: double.infinity,
         alignment: Alignment.center,
-        child: Text(
-          'Welcome '+ usrname,
-          style: TextStyle(
-            fontSize: 40,
+        child: Center(
+          child: Column(
+            children: [
+              Text(
+                'Welcome '+ usrname,
+                style: TextStyle(
+                  fontSize: 40,
+                ),
+              ),
+              ButtonTheme(
+                minWidth: size.width-20,
+                child: RaisedButton(
+                  shape: StadiumBorder(),
+                  color: Colors.blue,
+                  onPressed: () async {
+                    SharedPreferences preferences = await SharedPreferences.getInstance();
+                    await preferences.clear();
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>WelcomeScreen()));
+
+                  },
+                  child: Text('LOG OUT',style: TextStyle(color: Colors.white),),
+                ),),
+            ],
           ),
         ),
+
       ),
       floatingActionButton: Container(
         margin: EdgeInsets.all(5),
@@ -128,7 +139,9 @@ class _QRScanner extends State<QRScanner> {
 }
 
 Future<String> getData(details) async {
+  //print('Details'+details);
   var data = details;
+ // print('Running'+data);
   String body = json.encode(data);
   var url = 'https://demo121flutter.000webhostapp.com/addUserLog.php';
   http.Response response = await http.post(url, body: body);

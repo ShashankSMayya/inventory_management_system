@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:inventory_management_system/Screens/Scanner.dart';
 import 'package:inventory_management_system/Screens/details_screen.dart';
 import 'package:inventory_management_system/Screens/login.dart';
 import 'package:inventory_management_system/Screens/signup.dart';
 import 'package:inventory_management_system/Screens/welcome.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+    // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -34,5 +36,17 @@ class MyApp extends StatelessWidget {
       home: WelcomeScreen()
     );
   }
+  getStringValuesSF(data) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String stringValue = await prefs.getString(data.toString()) ?? 'blank value';
+    return stringValue;
+  }
+
+  addStringToSF(key, value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString(key.toString(), value.toString());
+  }
 }
+
+
 
