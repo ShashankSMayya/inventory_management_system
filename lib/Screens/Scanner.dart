@@ -31,14 +31,17 @@ class QRScanner extends StatefulWidget {
 }
 
 class _QRScanner extends State<QRScanner> {
-  var result = "";
+  var result = "",usrname;
+
+  Future getUsername() async{
+    usrname= await getStringValuesSF();
+    usrname =usrname.substring(11,usrname.length - 1);
+  }
 
   Future addUserlog(qrRes) async{
     result = qrRes.toString();
     currentPhoneDate = DateTime.now().toString();
     currentPhoneDate = currentPhoneDate.substring(0,19);
-    var usrname= await getStringValuesSF();
-    usrname =usrname.substring(11,usrname.length - 1);
     getData([usrname, currentPhoneDate, result]);
   }
 
@@ -79,6 +82,12 @@ class _QRScanner extends State<QRScanner> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    getUsername();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -92,7 +101,7 @@ class _QRScanner extends State<QRScanner> {
         width: double.infinity,
         alignment: Alignment.center,
         child: Text(
-          'Welcome User',
+          'Welcome '+ usrname,
           style: TextStyle(
             fontSize: 40,
           ),
